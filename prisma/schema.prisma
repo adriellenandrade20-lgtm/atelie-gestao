@@ -1,0 +1,94 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum TipoMovimentacao {
+  ENTRADA
+  SAIDA
+  PERDA
+}
+
+enum TipoItem {
+  INSUMO
+  PRODUTO
+}
+
+model User {
+  id           Int            @id @default(autoincrement())
+  nome         String
+  email        String         @unique
+  senha        String
+  criadoEm     DateTime       @default(now())
+  movimentacoes Movimentacao[]
+}
+
+model Insumo {
+  id                 Int            @id @default(autoincrement())
+  nome               String         @unique
+  categoria          String
+  quantidade         Float          @default(0)
+  unidadeMedida      String
+  custoUnitario      Float          @default(0)
+  estoqueMinimo      Float          @default(0)
+  fichaTecnica       FichaTecnica[]
+  criadoEm           DateTime       @default(now())
+  atualizadoEm       DateTime       @updatedAt
+}
+
+model Produto {
+  id           Int            @id @default(autoincrement())
+  nome         String         @unique
+  categoria    String
+  descricao    String         @default("")
+  precoVenda   Float
+  estoqueQtd   Int            @default(0)
+  imagemUrl    String?
+  fichaTecnica FichaTecnica[]
+  vendas       Venda[]
+  criadoEm     DateTime       @default(now())
+  atualizadoEm DateTime       @updatedAt
+}
+
+model FichaTecnica {
+  id                   Int     @id @default(autoincrement())
+  produtoId            Int
+  insumoId             Int
+  quantidadeNecessaria Float
+  produto              Produto @relation(fields: [produtoId], references: [id], onDelete: Cascade)
+  insumo               Insumo  @relation(fields: [insumoId], references: [id], onDelete: Restrict)
+
+  @@unique([produtoId, insumoId])
+}
+
+model Movimentacao {
+  id         Int              @id @default(autoincrement())
+  tipo       TipoMovimentacao
+  itemTipo   TipoItem
+  itemId     Int
+  quantidade Float
+  valorUnitario Float?
+  motivo     String
+  data       DateTime         @default(now())
+  usuarioId  Int
+  usuario    User             @relation(fields: [usuarioId], references: [id], onDelete: Restrict)
+
+  @@index([itemTipo, itemId, data])
+  @@index([usuarioId, data])
+}
+
+model Venda {
+  id        Int      @id @default(autoincrement())
+  produtoId Int
+  quantidade Int
+  valorTotal Float
+  custoTotal Float
+  data      DateTime @default(now())
+  produto   Produto  @relation(fields: [produtoId], references: [id], onDelete: Restrict)
+
+  @@index([data])
+}

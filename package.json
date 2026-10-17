@@ -1,0 +1,53 @@
+{
+  "name": "atelie-gestao",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -k -n api,web -c green,blue \"npm:dev:api\" \"npm:dev:web\"",
+    "dev:api": "node --env-file=.env --watch server/index.js",
+    "dev:web": "vite --host 0.0.0.0 --port 5173",
+    "start:api": "node --env-file=.env server/index.js",
+    "start": "npx prisma migrate deploy && node server/index.js",
+    "pm2:start": "pm2 startOrRestart ecosystem.config.cjs",
+    "pm2:stop": "pm2 stop ecosystem.config.cjs",
+    "pm2:restart": "pm2 restart ecosystem.config.cjs --update-env",
+    "pm2:delete": "pm2 delete ecosystem.config.cjs",
+    "pm2:logs": "pm2 logs",
+    "pm2:save": "pm2 save",
+    "pm2:startup": "pm2 startup",
+    "build": "vite build",
+    "build:api": "prisma generate",
+    "lint": "oxlint",
+    "preview": "vite preview",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:seed": "prisma db seed",
+    "db:setup": "prisma migrate dev --name init"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.19.3",
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "express": "^5.3.0",
+    "jsonwebtoken": "^9.0.3",
+    "prisma": "^6.19.3",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.7",
+    "@vitejs/plugin-react": "^6.1.1",
+    "autoprefixer": "^10.6.1",
+    "concurrently": "^10.0.6",
+    "oxlint": "^1.81.0",
+    "pm2": "^7.0.4",
+    "postcss": "^8.5.30",
+    "tailwindcss": "^3.4.19",
+    "vite": "^8.3.0"
+  },
+  "prisma": {
+    "seed": "node --env-file=.env prisma/seed.js"
+  }
+}
